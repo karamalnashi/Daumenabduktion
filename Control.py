@@ -32,12 +32,12 @@ maxVol = volRange [1]
 vol = 0
 volBar = 400
 volPer = 0
-
+t,t1=41,41
 
 # ###################    MQTT Connect  ##################################################
-broker_address = "l51d159d-internet-facing-6e9635f0905aed75.elb.us-east-1.amazonaws.com"
+broker_address = "localhost"
 port = 1883
-user = "test"
+user = "mqtt"
 password = "test"
 
 def on_connect(client, userdata, flags, rc):
@@ -95,14 +95,14 @@ while True:
         if length <40:
             cv2.circle(img, (cx, cy), 15, (0, 255, 0), cv2.FILLED)
             cv2.putText(img, str("Ihres Daumens an Ihre Hand heran"), (20, 50),
-                        cv2.FONT_HERSHEY_PLAIN, 3,
-                        (255, 0, 0), 3)
-            cv2.imshow("Image", img)
+                        cv2.FONT_HERSHEY_PLAIN, 2,
+                        (255, 0, 0), 2)
+            #cv2.imshow("Image", img)
             f = open('data.json')
             data = json.load(f)
-            x = data[1]
+            x = data[0]
             y1 = json.dumps(x)
-            if t > 40:
+            if t > 42:
                 client.publish("ebrain/DialogEngine1/interaction", y1)
                 t = 0
             else:
@@ -112,12 +112,12 @@ while True:
         elif length>80 :
             cv2.circle(img, (cx, cy), 15, (0, 255, 0), cv2.FILLED)
             cv2.putText(img, str("Ihres Daumens wieder weit weg."), (20, 50),
-                        cv2.FONT_HERSHEY_PLAIN, 3,
-                        (255, 0, 0), 3)
-            cv2.imshow("Image", img)
+                        cv2.FONT_HERSHEY_PLAIN, 2,
+                        (255, 0, 0), 2)
+            #cv2.imshow("Image", img)
             f = open('data.json')
             data = json.load(f)
-            x = data[2]
+            x = data[1]
             y2 = json.dumps(x)
             if t1 > 40:
                 client.publish("ebrain/DialogEngine1/interaction", y2)
@@ -134,11 +134,11 @@ while True:
         cv2.putText(img, f'{int(volPer)} %', (40, 450), cv2.FONT_HERSHEY_COMPLEX,
                     1, (255, 0, 0), 3)
 
-        cTime = time.time()
-        fps = 1 / (cTime - pTime)
-        pTime = cTime
-        cv2.putText(img, f'FPS: {int(fps)}', (40, 50), cv2.FONT_HERSHEY_COMPLEX,
-                    1, (255, 0, 0), 3)
+        #cTime = time.time()
+        #fps = 1 / (cTime - pTime)
+        #pTime = cTime
+       # cv2.putText(img, f'FPS: {int(fps)}', (40, 50), cv2.FONT_HERSHEY_COMPLEX,
+                    #1, (255, 0, 0), 3)
 
         cv2.imshow("Img", img)
         cv2.waitKey(1)
