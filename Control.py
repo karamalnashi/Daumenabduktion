@@ -1,9 +1,10 @@
 import json
-
 import paho.mqtt.client as mqttclient
 import cv2
 import time
 import numpy as np
+import pyttsx3
+
 import Pose_Module as htm
 import math
 from ctypes import cast, POINTER
@@ -20,25 +21,25 @@ cap.set(4, hCam)
 pTime = 0
 detector = htm.handDetector(detectionCon=0.7)
 
-devices = AudioUtilities.GetSpeakers()
-interface = devices.Activate(
-    IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-volume = cast(interface, POINTER(IAudioEndpointVolume))
-# volume.GetMute()
-# volume.GetMasterVolumeLevel()
-volRange = volume.GetVolumeRange()
-minVol = volRange [0]
-maxVol = volRange [1]
-vol = 0
+
 volBar = 400
 volPer = 0
-t,t1=41,41
+t,t1=100,100
+count = 0
+dir=0
 
 # ###################    MQTT Connect  ##################################################
 broker_address = "localhost"
 port = 1883
 user = "mqtt"
 password = "test"
+def convert (data1):
+    data = json.loads(data1)
+    say = data["content"]["say"]
+    print(say)
+    text_speech = pyttsx3.init()
+    text_speech.say(say)
+    text_speech.runAndWait()
 
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
@@ -51,6 +52,8 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, message):
     print("message recieved = " + str(message.payload.decode("utf-8")))
     print("message topic=", message.topic)
+
+    convert(message.payload.decode("utf-8"))
 
 Messagerecieved = False
 connected = False
@@ -83,18 +86,29 @@ while True:
         length = math.hypot(x2 - x1, y2 - y1)
         print(length)
 
-        # Hand range 50 - 100
-        # Volume Range -65 - 0
 
-        vol = np.interp(length, [50, 110], [minVol, maxVol])
+
         volBar = np.interp(length, [50, 110], [400, 150])
         volPer = np.interp(length,[50, 110],[0, 100])
-        print(int(length), vol)
-        volume.SetMasterVolumeLevel(vol, None)
+        print(int(length))
+
+        color = (255, 0, 255)
+        if volPer == 100:
+            color = (0, 255, 0)
+            if dir == 0:
+                count += 0.5
+                dir = 1
+        if volPer == 0:
+            color = (0, 255, 0)
+            if dir == 1:
+                count += 0.5
+                dir = 0
+
+
 
         if length <40:
             cv2.circle(img, (cx, cy), 15, (0, 255, 0), cv2.FILLED)
-            cv2.putText(img, str("Ihres Daumens an Ihre Hand heran"), (20, 50),
+            cv2.putText(img, str("Ihres Daumens wieder weit weg"), (20, 50),
                         cv2.FONT_HERSHEY_PLAIN, 2,
                         (255, 0, 0), 2)
             #cv2.imshow("Image", img)
@@ -102,16 +116,16 @@ while True:
             data = json.load(f)
             x = data[0]
             y1 = json.dumps(x)
-            if t > 42:
-                client.publish("ebrain/DialogEngine1/interaction", y1)
+            if t > 99:
+                client.publish("ebrain/DialogEngine1/interaction",y1)
                 t = 0
             else:
                 t = t + 1
                 print(t)
-                t1=41
-        elif length>80 :
+                t1=100
+        elif length>110 :
             cv2.circle(img, (cx, cy), 15, (0, 255, 0), cv2.FILLED)
-            cv2.putText(img, str("Ihres Daumens wieder weit weg."), (20, 50),
+            cv2.putText(img, str("Ihres Daumens an Ihre Hand heran"), (20, 50),
                         cv2.FONT_HERSHEY_PLAIN, 2,
                         (255, 0, 0), 2)
             #cv2.imshow("Image", img)
@@ -119,13 +133,13 @@ while True:
             data = json.load(f)
             x = data[1]
             y2 = json.dumps(x)
-            if t1 > 40:
+            if t1 > 99:
                 client.publish("ebrain/DialogEngine1/interaction", y2)
                 t1 = 0
             else:
                 t1 = t1 + 1
                 print(t1)
-                t=41
+                t=100
 
 
 
@@ -133,6 +147,8 @@ while True:
         cv2.rectangle(img, (50, int(volBar)), (85, 400), (255, 0, 0), cv2.FILLED)
         cv2.putText(img, f'{int(volPer)} %', (40, 450), cv2.FONT_HERSHEY_COMPLEX,
                     1, (255, 0, 0), 3)
+        cv2.putText(img, "count: " + str(int(count)), (150, 450), cv2.FONT_HERSHEY_PLAIN, 2,
+                    (255, 0, 0), 2)
 
         #cTime = time.time()
         #fps = 1 / (cTime - pTime)

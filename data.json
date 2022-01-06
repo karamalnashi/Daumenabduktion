@@ -7,7 +7,7 @@
                     "message_uuid": "DialogEngine1-interaction19635f4c-52b0-11ec-956f-f8b156cd740c",
 
                     "content": {
-                        "say": "Ihres Daumens an Ihre Hand heran",
+                        "say": "Ihres Daumens wieder weit weg",
                         "image": "",
                         "answers": [
                             ""
@@ -27,7 +27,7 @@
                     "message_uuid": "DialogEngine1-interaction19635f4c-52b0-11ec-956f-f8b156cd740c",
 
                     "content": {
-                        "say": "Ihres Daumens wieder weit weg.",
+                        "say": "Ihres Daumens an Ihre Hand heran",
                         "image": "",
                         "answers": [
                             ""
