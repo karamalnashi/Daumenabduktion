@@ -27,6 +27,7 @@ volPer = 0
 t,t1=100,100
 count = 0
 dir=0
+hand =1  # hand=0 => left hand       //          hand=1 => right hand
 
 # ###################    MQTT Connect  ##################################################
 broker_address = "localhost"
@@ -67,6 +68,36 @@ client.loop_start()
 client.subscribe("ebrain/#")
 
 #############################################################################
+success, img = cap.read()
+img = detector.findHands(img)
+lmList = detector.findPosition(img, draw=False)
+thumb_tip = lmList[4][1]
+print(thumb_tip)
+pinky_tip = lmList[20][1]
+print(pinky_tip)
+if hand == 0:
+    if thumb_tip < pinky_tip:
+        pass
+    else:
+        print("Bitte drehen Sie Ihre Hand")
+        f = open('data.json')
+        data = json.load(f)
+        x = data[2]
+        y3 = json.dumps(x)
+        client.publish("ebrain/DialogEngine1/interaction", y3)
+        time.sleep(6)
+else:
+    if thumb_tip < pinky_tip:
+        print("Bitte drehen Sie Ihre Hand")
+        f = open('data.json')
+        data = json.load(f)
+        x = data[2]
+        y3 = json.dumps(x)
+        client.publish("ebrain/DialogEngine1/interaction", y3)
+        time.sleep(6)
+    else:
+        pass
+
 while True:
     success, img = cap.read()
     img = detector.findHands(img)
@@ -84,13 +115,13 @@ while True:
         cv2.circle(img, (cx, cy), 7, (255, 0, 255), cv2.FILLED)
 
         length = math.hypot(x2 - x1, y2 - y1)
-        print(length)
+        #print(length)
 
 
 
         volBar = np.interp(length, [50, 110], [400, 150])
         volPer = np.interp(length,[50, 110],[0, 100])
-        print(int(length))
+        #print(int(length))
 
         color = (255, 0, 255)
         if volPer == 100:
@@ -157,4 +188,4 @@ while True:
                     #1, (255, 0, 0), 3)
 
         cv2.imshow("Img", img)
-        cv2.waitKey(1)
+    cv2.waitKey(1)

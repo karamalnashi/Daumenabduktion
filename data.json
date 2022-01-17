@@ -37,4 +37,24 @@
                         "stateID": "0_start"
                     }
 }
+  ,
+  {
+                    "api_version": "v0.1.0",
+                    "time": 1638367683.530698,
+                    "time_hr": "2021-12-01T15:08:03.530698",
+                    "sender_CID": "DialogEngine1",
+                    "message_type": "interaction",
+                    "message_uuid": "DialogEngine1-interaction19635f4c-52b0-11ec-956f-f8b156cd740c",
+
+                    "content": {
+                        "say": "Bitte drehen Sie Ihre Hand",
+                        "image": "",
+                        "answers": [
+                            ""
+                        ],
+                        "answer_topic": "ebrain/answers",
+                        "layout_type": "media_1answer",
+                        "stateID": "0_start"
+                    }
+}
 ]
